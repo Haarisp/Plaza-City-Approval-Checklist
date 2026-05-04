@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Approval Checklist — Plaza Restaurant Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --charcoal: #1C1C1C;
+    --dark: #2A2420;
+    --rust: #C4541A;
+    --rust-light: #E8703A;
+    --gold: #C9922A;
+    --navy: #1B3A5C;
+    --navy-light: #2E5F96;
+    --green: #2D6A4F;
+    --green-light: #52B788;
+    --muted: #7A6F65;
+    --border: #E2DDD6;
+    --section-bg: #F4EFE8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--dark); min-height: 100vh; }
+  @media print {
+    body { background: white; }
+    .no-print { display: none !important; }
+    .tab-panel.active { display: block !important; }
+    header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  header {
+    background: var(--charcoal); color: var(--cream);
+    padding: 44px 40px 36px; position: relative; overflow: hidden;
+  }
+  header::before { content:''; position:absolute; top:-60px; right:-60px; width:280px; height:280px; border-radius:50%; background:rgba(196,84,26,.15); }
+  header::after  { content:''; position:absolute; bottom:-40px; left:32%; width:180px; height:180px; border-radius:50%; background:rgba(201,146,42,.1); }
+  .header-tag { display:inline-block; font-size:11px; font-weight:500; letter-spacing:.15em; text-transform:uppercase; color:var(--rust-light); border:1px solid rgba(232,112,58,.4); padding:5px 14px; border-radius:20px; margin-bottom:16px; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(28px,4.5vw,48px); font-weight:900; line-height:1.08; max-width:600px; margin-bottom:14px; }
+  header h1 em { color:var(--rust-light); font-style:normal; }
+  .header-sub { font-size:14px; color:rgba(250,247,242,.6); font-weight:300; max-width:480px; line-height:1.6; }
+
+  .tab-bar { background:var(--section-bg); border-bottom:1px solid var(--border); display:flex; position:sticky; top:0; z-index:100; }
+  .tab-btn {
+    flex:1; padding:16px 12px; border:none; background:transparent;
+    font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
+    cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    border-bottom:3px solid transparent; color:var(--muted); transition:all .2s ease; position:relative;
+  }
+  .tab-btn:hover { color:var(--charcoal); }
+  .tab-btn.active-tenant { color:var(--rust); border-bottom-color:var(--rust); background:rgba(196,84,26,.04); }
+  .tab-btn.active-owner  { color:var(--navy); border-bottom-color:var(--navy); background:rgba(27,58,92,.04); }
+  .tab-icon { font-size:20px; }
+  .tab-label { font-size:13px; font-weight:600; letter-spacing:.02em; }
+  .tab-sublabel { font-size:11px; font-weight:300; color:var(--muted); }
+  .tab-pill { position:absolute; top:8px; right:12px; font-size:10px; font-weight:600; padding:2px 7px; border-radius:10px; }
+  .tab-btn.active-tenant .tab-pill { background:rgba(196,84,26,.12); color:var(--rust); }
+  .tab-btn.active-owner  .tab-pill { background:rgba(27,58,92,.12); color:var(--navy); }
+  .tab-btn:not(.active-tenant):not(.active-owner) .tab-pill { background:var(--border); color:var(--muted); }
+
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  .prog-bar-wrap { padding:14px 40px; display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--border); }
+  .tenant-prog { background:rgba(196,84,26,.06); }
+  .owner-prog  { background:rgba(27,58,92,.06); }
+  .prog-label  { font-size:11px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  .prog-track  { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .prog-fill   { height:100%; width:0%; border-radius:3px; transition:width .4s ease; }
+  .tenant-fill-bar { background:linear-gradient(90deg,var(--rust),var(--gold)); }
+  .owner-fill-bar  { background:linear-gradient(90deg,var(--navy),var(--navy-light)); }
+  .prog-count  { font-size:12px; font-weight:500; white-space:nowrap; min-width:75px; text-align:right; }
+  .tenant-panel .prog-count { color:var(--rust); }
+  .owner-panel  .prog-count { color:var(--navy); }
+
+  main { max-width:860px; margin:0 auto; padding:36px 24px 80px; }
+
+  .intro-note { padding:16px 20px; border-radius:0 10px 10px 0; margin-bottom:36px; font-size:13.5px; line-height:1.7; color:#4A3D30; }
+  .tenant-intro { background:linear-gradient(135deg,#FFF8F0,#FFF3E6); border-left:4px solid var(--gold); }
+  .owner-intro  { background:linear-gradient(135deg,#F0F4FF,#E8EEFF); border-left:4px solid var(--navy-light); }
+  .tenant-intro strong { color:var(--rust); }
+  .owner-intro  strong { color:var(--navy); }
+
+  .shared-callout { background:linear-gradient(135deg,#EEF2FF,#E6ECFF); border:1px solid rgba(27,58,92,.15); border-radius:10px; padding:14px 18px; font-size:13px; color:#1B3A5C; line-height:1.6; margin-bottom:28px; display:flex; gap:12px; align-items:flex-start; }
+  .shared-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
+
+  .section { margin-bottom:32px; }
+  .section-header { display:flex; align-items:center; gap:12px; margin-bottom:6px; padding-bottom:12px; border-bottom:2px solid var(--border); }
+  .sec-num { font-family:'Playfair Display',serif; font-size:12px; font-weight:700; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .tenant-num { color:var(--rust); background:rgba(196,84,26,.08); }
+  .owner-num  { color:var(--navy); background:rgba(27,58,92,.08); }
+  .section-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--charcoal); flex:1; }
+  .sec-badge { font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+  .badge-req  { background:rgba(196,84,26,.12); color:var(--rust); }
+  .badge-cond { background:rgba(201,146,42,.12); color:var(--gold); }
+  .badge-own  { background:rgba(27,58,92,.12);  color:var(--navy); }
+
+  .checklist { list-style:none; display:flex; flex-direction:column; gap:2px; padding-top:6px; }
+  .check-item { display:flex; align-items:flex-start; gap:12px; padding:13px 14px; border-radius:8px; cursor:pointer; transition:background .15s; border:1px solid transparent; }
+  .check-item:hover { border-color:rgba(0,0,0,.07); background:rgba(0,0,0,.02); }
+  .check-item.done  { background:rgba(45,106,79,.05); border-color:rgba(45,106,79,.15); }
+  .checkbox { width:19px; height:19px; border:2px solid var(--border); border-radius:5px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; transition:all .2s; background:white; }
+  .check-item.done .checkbox { background:var(--green); border-color:var(--green); }
+  .check-item.done .checkbox::after { content:'✓'; color:white; font-size:11px; font-weight:700; }
+  .check-content { flex:1; }
+  .check-label { font-size:14px; font-weight:500; color:var(--charcoal); line-height:1.4; }
+  .check-item.done .check-label { color:var(--muted); text-decoration:line-through; text-decoration-color:var(--green-light); }
+  .check-note { font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.5; font-weight:300; }
+  .check-item.done .check-note { opacity:.55; }
+  .tag { display:inline-block; font-size:10px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; padding:2px 8px; border-radius:10px; margin-left:8px; vertical-align:middle; }
+  .tag-early  { background:rgba(196,84,26,.1); color:var(--rust); }
+  .tag-cond   { background:rgba(201,146,42,.1); color:#a07518; }
+
+  .action-bar { display:flex; gap:10px; margin-top:40px; flex-wrap:wrap; }
+  .btn { padding:11px 22px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:500; cursor:pointer; border:none; transition:all .2s; display:flex; align-items:center; gap:7px; }
+  .btn-tenant { background:var(--charcoal); color:var(--cream); }
+  .btn-tenant:hover { background:var(--rust); }
+  .btn-owner  { background:var(--navy); color:white; }
+  .btn-owner:hover  { background:var(--navy-light); }
+  .btn-sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .btn-sec:hover { border-color:var(--rust); color:var(--rust); }
+
+  .done-banner { display:none; color:white; padding:22px 28px; border-radius:12px; margin-top:28px; text-align:center; animation:fadeIn .4s ease; }
+  .done-banner.show { display:block; }
+  .tenant-banner { background:linear-gradient(135deg,var(--green),#1B4332); }
+  .owner-banner  { background:linear-gradient(135deg,var(--navy),#0D2340); }
+  .done-banner h3 { font-family:'Playfair Display',serif; font-size:22px; margin-bottom:6px; }
+  .done-banner p  { font-size:13px; opacity:.85; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  footer { text-align:center; padding:20px; font-size:12px; color:var(--muted); border-top:1px solid var(--border); margin-top:16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Plaza Restaurant Onboarding</div>
+  <h1>City Approval <em>Checklist</em></h1>
+  <p class="header-sub">Tasks separated by role — building owner responsibilities and restaurant tenant responsibilities are distinct. Select your view below.</p>
+</header>
+
+<div class="tab-bar no-print">
+  <button class="tab-btn active-tenant" id="tab-tenant" onclick="switchTab('tenant')">
+    <span class="tab-icon">🍽️</span>
+    <span class="tab-label">Restaurant Tenant</span>
+    <span class="tab-sublabel">Your permits & approvals</span>
+    <span class="tab-pill" id="tenant-pill">0%</span>
+  </button>
+  <button class="tab-btn" id="tab-owner" onclick="switchTab('owner')">
+    <span class="tab-icon">🏢</span>
+    <span class="tab-label">Building Owner</span>
+    <span class="tab-sublabel">Management responsibilities</span>
+    <span class="tab-pill" id="owner-pill">0%</span>
+  </button>
+</div>
+
+<!-- ═══════════ TENANT PANEL ═══════════ -->
+<div class="tab-panel tenant-panel active" id="panel-tenant">
+  <div class="prog-bar-wrap tenant-prog">
+    <span class="prog-label">My Progress</span>
+    <div class="prog-track"><div class="prog-fill tenant-fill-bar" id="tenantFill"></div></div>
+    <span class="prog-count" id="tenantCount">0 of 0 done</span>
+  </div>
+  <main>
+    <div class="intro-note tenant-intro">
+      <strong>Restaurant Tenant Checklist</strong> — These are items <em>you</em> are responsible for obtaining and completing before your opening day. Submit applications early; city processing takes 2–8 weeks. Keep copies of all permits on-site at all times.
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num tenant-num">1</div>
+        <div class="section-title">Business Registration & Licensing</div>
+        <span class="sec-badge badge-req">Required</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">City Business License<span class="tag tag-early">Do First</span></div><div class="check-note">Register with the city clerk's office. Required before any other permits can be issued.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">DBA / Assumed Name Filing (if applicable)</div><div class="check-note">File with the county if operating under a trade name different from your legal business name.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">State Sales Tax Permit</div><div class="check-note">Apply through the state comptroller's office before collecting any sales tax.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Federal EIN (if hiring employees)</div><div class="check-note">Apply free at IRS.gov. Required for corporations, partnerships, and employers.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num tenant-num">2</div>
+        <div class="section-title">Health Department Approvals</div>
+        <span class="sec-badge badge-req">Required</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Food Service Establishment Permit<span class="tag tag-early">Do First</span></div><div class="check-note">Apply with the city/county health department. Submit kitchen layout, equipment list, and food handling procedures for plan review.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Health Department Plan Review Scheduled</div><div class="check-note">Pre-opening review of kitchen design and sanitation setup. Schedule 2–4 weeks in advance.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Final Health Inspection — Passed</div><div class="check-note">On-site inspection of kitchen, refrigeration, handwashing stations, and food safety practices. Must pass before opening.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Food Manager Certification (ServSafe or equivalent)</div><div class="check-note">At least one certified food manager required on staff. Food handler cards may be required for all employees.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Dedicated Handwashing Stations Installed</div><div class="check-note">Separate from prep sinks. Must have hot/cold water, soap, and paper towels at all times.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num tenant-num">3</div>
+        <div class="section-title">Fire & Safety</div>
+        <span class="sec-badge badge-req">Required</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Hood & Fire Suppression System Installed<span class="tag tag-early">Schedule Early</span></div><div class="check-note">Required for open-flame or high-heat cooking. Licensed contractor only. Coordinate timing with building management (contact Miguel).</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Fire Extinguishers Installed & Tagged</div><div class="check-note">Class K in kitchen; Class ABC in dining area. Must be inspected and tagged annually.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Emergency Exit Floor Plan Posted</div><div class="check-note">Visible evacuation map with all exits displayed inside the restaurant.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num tenant-num">4</div>
+        <div class="section-title">Buildout & Utility Permits</div>
+        <span class="sec-badge badge-cond">If Modifying Space</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Building Permit for Tenant Improvements</div><div class="check-note">Required if modifying walls, plumbing, or electrical. All work by licensed contractors with management's written approval.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Blueprint / Floor Plan Submitted to City</div><div class="check-note">Show seating, kitchen, exits, bathrooms, and equipment placement. Required for CO and building permits.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Grease Trap Confirmed / Installed<span class="tag tag-cond">If Required</span></div><div class="check-note">Check with management and the city — required for most full kitchens; may apply to fruiterias. Must be inspected before opening.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Plumbing Permit & Inspection (if new plumbing)</div><div class="check-note">Required for any new sinks, drains, or water lines. Must be permitted and inspected by city.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num tenant-num">5</div>
+        <div class="section-title">Signage</div>
+        <span class="sec-badge badge-req">Approval Before Install</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Written Approval from Management<span class="tag tag-early">Do First</span></div><div class="check-note">Submit sign design, size, and placement to management before applying for a city permit. Creativity is encouraged — make it memorable!</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">City Sign Permit Applied & Approved</div><div class="check-note">Submit dimensions, design, and placement plan to the city permitting office.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Sign Installed by Licensed Contractor</div><div class="check-note">No self-installation on exterior walls or above the unit entrance.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num tenant-num">6</div>
+        <div class="section-title">Outdoor / Cart Operations</div>
+        <span class="sec-badge badge-cond">If Applicable</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Outdoor Vending / Cart Permit (City)<span class="tag tag-early">Apply Early</span></div><div class="check-note">Required for corn carts or any sales outside your leased unit. Processing can take several weeks.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Food Truck / Mobile Unit Permit (if applicable)</div><div class="check-note">Separate permit required if operating both an indoor restaurant and an outdoor truck or cart.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Health Permit for Cart / Outdoor Unit</div><div class="check-note">Required even if connected to an already-permitted indoor kitchen.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num tenant-num">7</div>
+        <div class="section-title">Final Steps Before Opening</div>
+        <span class="sec-badge badge-req">Required</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">All Permits Received & Posted On-Site</div><div class="check-note">Food service permit, CO, and business license must be displayed visibly inside your restaurant.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Insurance Certificate Submitted to Management</div><div class="check-note">General liability certificate naming the plaza as additional insured must be on file before opening.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Employee Records Ready (I-9, Food Handler Cards)</div><div class="check-note">Keep all employment eligibility forms and certifications on file and available for inspection.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'tenant')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Final Walkthrough with Plaza Management</div><div class="check-note">Schedule a walkthrough to confirm all plaza requirements are met before your open date.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="done-banner tenant-banner" id="tenantBanner">
+      <h3>🎉 All Done!</h3>
+      <p>Every tenant item is checked. Congratulations and welcome to the plaza!</p>
+    </div>
+    <div class="action-bar no-print">
+      <button class="btn btn-tenant" onclick="window.print()">🖨 Print My Checklist</button>
+      <button class="btn btn-sec" onclick="resetGroup('tenant')">↺ Reset</button>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════ OWNER PANEL ═══════════ -->
+<div class="tab-panel owner-panel" id="panel-owner">
+  <div class="prog-bar-wrap owner-prog">
+    <span class="prog-label">Owner Progress</span>
+    <div class="prog-track"><div class="prog-fill owner-fill-bar" id="ownerFill"></div></div>
+    <span class="prog-count" id="ownerCount">0 of 0 done</span>
+  </div>
+  <main>
+    <div class="intro-note owner-intro">
+      <strong>Building Owner / Management Checklist</strong> — These are tasks the plaza owner and management team must complete to prepare units for restaurant tenants and ensure the plaza meets all city requirements.
+    </div>
+    <div class="shared-callout">
+      <span class="shared-icon">🤝</span>
+      <div><strong>Coordination note:</strong> Some items require joint action between management and tenants — for example, hood installation requires management to schedule with Miguel <em>and</em> the tenant to hire a licensed contractor. Items that overlap with tenant responsibilities are noted.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num owner-num">1</div>
+        <div class="section-title">Unit Readiness & Infrastructure</div>
+        <span class="sec-badge badge-own">Owner Responsibility</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Floor Plans Finalized & Sent to Each Tenant<span class="tag tag-early">Do First</span></div><div class="check-note">Send updated floor plan showing each unit's number, dimensions, and neighbors. Create per-unit versions as needed.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Water & Drainage Capacity Confirmed Per Unit</div><div class="check-note">Verify adequate supply and drainage for each tenant's business type — especially fruiterias and full kitchens.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Electrical Connections Mapped & Communicated to Tenants</div><div class="check-note">Notify tenants of connection locations via Aslam. Assign electrician for permitted work.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Hood Installation Scheduling Coordinated (Miguel)</div><div class="check-note">Facilitate scheduling with Miguel for all tenants installing hood systems. Arrange loans for qualifying existing tenants.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Equipment Move-In Window Communicated (May 15–End of May)</div><div class="check-note">Confirm move-in window with qualifying tenants. Clarify what items on walls can/cannot be relocated and document existing claims.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num owner-num">2</div>
+        <div class="section-title">City & Permit Coordination</div>
+        <span class="sec-badge badge-own">Owner Responsibility</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">TCO (Temporary Certificate of Occupancy) Status Tracked</div><div class="check-note">Monitor plaza-level TCO progress with the city and communicate milestone updates to tenants.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">City Contacted re: Grease Trap Requirements</div><div class="check-note">Get first-hand city confirmation on which business types (including fruiterias) require a grease trap. Share findings with affected tenants.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Outdoor Cart / Corn Vendor Permit — City Inquiry Made<span class="tag tag-early">Apply Early</span></div><div class="check-note">Contact city to understand timeline and requirements for outdoor cart permits on plaza property. Share with tenants requesting carts.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Joint / Expedited Inspection Program Explored</div><div class="check-note">Ask city about concurrent inspection scheduling or fast-track commercial permitting to reduce redundant visits across multiple restaurant tenants.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Blueprint Plan Requirement Clarified with City</div><div class="check-note">Confirm exactly what each restaurant tenant must submit in terms of blueprints before the city issues occupancy approval.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num owner-num">3</div>
+        <div class="section-title">Tenant Communication & Documentation</div>
+        <span class="sec-badge badge-own">Owner Responsibility</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">City/Health Approval Checklist Distributed to All Restaurant Tenants</div><div class="check-note">Provide each tenant with their customized checklist based on business type (full kitchen, fruiteria, cart, etc.).</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">24-Hour Decision Notices Sent to Identified Tenants</div><div class="check-note">Identify which tenants need a prompt decision on their space and send written notice with a clear deadline.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Julissa Fridge / Ice Maker Documentation Located</div><div class="check-note">Find communication from Julissa confirming the 2 fridges and ice maker situation. Verify with Sagar and document in the tenant file.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Insurance Certificates Collected from All Tenants</div><div class="check-note">Ensure every tenant submits a general liability certificate naming the plaza as additional insured before opening.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Lease Agreements Confirmed for All Tenants</div><div class="check-note">Verify signed leases and term commitments are on file. Confirm details such as Farooq's 1-year commitment.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num owner-num">4</div>
+        <div class="section-title">Plaza Common Areas & Exterior</div>
+        <span class="sec-badge badge-own">Owner Responsibility</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Signage Policy Communicated to All Tenants</div><div class="check-note">Inform tenants of the approval process, city permit requirement, and contractor-only installation rule. Encourage creative, distinctive signage.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Outdoor Drinking Water Station Location Approved</div><div class="check-note">Determine final placement. Standard: 18 inches outside tenant boundary; restaurants may request up to 24 inches with prior approval.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Seating Area Near Restaurant 6 / Stella's Corner Planned</div><div class="check-note">Evaluate feasibility of corner tables for Restaurant 6. Coordinate Stella's corner area improvements as promised.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Wall Modification Request (Stall #1 & Jewelry Tenants) — Decision Made</div><div class="check-note">Investigate back-wall move request from Stall #1. Determine if management covers first month if approved. Also review 4 jewelry tenants requesting wall modifications.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Unit Reassignments Confirmed (Cell Phone Repair → Fruiteria Side)</div><div class="check-note">Confirm which tenants can relocate to open the water supply side for the Fruiteria. Get written confirmation from affected tenants before reassigning.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="sec-num owner-num">5</div>
+        <div class="section-title">Final Pre-Opening Walkthroughs</div>
+        <span class="sec-badge badge-own">Owner Responsibility</span>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Walkthrough Scheduled with Each Restaurant Tenant</div><div class="check-note">Confirm all units meet plaza requirements before each tenant's open date. Document any outstanding items.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Verify All Tenant Permits Are Posted On-Site</div><div class="check-note">During walkthrough, confirm each restaurant has food service permit, CO, and business license visibly displayed.</div></div></li>
+        <li class="check-item" onclick="toggle(this,'owner')"><div class="checkbox"></div><div class="check-content"><div class="check-label">Parking Layout & Events Calendar Finalized</div><div class="check-note">Confirm parking plan and coordinate the plaza events calendar with Aslam. Share with all tenants before opening.</div></div></li>
+      </ul>
+    </div>
+
+    <div class="done-banner owner-banner" id="ownerBanner">
+      <h3>✅ All Owner Tasks Complete!</h3>
+      <p>All management items are checked. The plaza is ready for opening day.</p>
+    </div>
+    <div class="action-bar no-print">
+      <button class="btn btn-owner" onclick="window.print()">🖨 Print Owner Checklist</button>
+      <button class="btn btn-sec" onclick="resetGroup('owner')">↺ Reset</button>
+    </div>
+  </main>
+</div>
+
+<footer>Plaza Restaurant Onboarding &nbsp;·&nbsp; City Approval Checklist &nbsp;·&nbsp; Contact management with any questions</footer>
+
+<script>
+  function switchTab(tab) {
+    document.getElementById('panel-tenant').classList.toggle('active', tab === 'tenant');
+    document.getElementById('panel-owner').classList.toggle('active', tab === 'owner');
+    document.getElementById('tab-tenant').className = 'tab-btn' + (tab==='tenant' ? ' active-tenant' : '');
+    document.getElementById('tab-owner').className  = 'tab-btn' + (tab==='owner'  ? ' active-owner'  : '');
+  }
+  function toggle(el, group) { el.classList.toggle('done'); updateProgress(group); }
+  function updateProgress(group) {
+    const panel = document.getElementById('panel-' + group);
+    const all = panel.querySelectorAll('.check-item');
+    const done = panel.querySelectorAll('.check-item.done');
+    const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+    document.getElementById(group + 'Fill').style.width = pct + '%';
+    document.getElementById(group + 'Count').textContent = done.length + ' of ' + all.length + ' done';
+    document.getElementById(group + '-pill').textContent = pct + '%';
+    const b = document.getElementById(group + 'Banner');
+    if (b) b.classList.toggle('show', done.length === all.length && all.length > 0);
+  }
+  function resetGroup(group) {
+    document.getElementById('panel-' + group).querySelectorAll('.check-item.done').forEach(el => el.classList.remove('done'));
+    updateProgress(group);
+  }
+  updateProgress('tenant');
+  updateProgress('owner');
+</script>
+</body>
+</html>
